@@ -23,7 +23,7 @@ Invoice details, logos, and drafts stay in this browser. The page does not send 
 - Line items with quantity, rate, and a computed amount
 - Percent or fixed discount, then a named tax rate
 - Currency list, plus a custom symbol
-- Three templates: Ledger, Seal, and Plain
+- Three templates: Ledger, Gold Seal, and Plain
 - A4 or US Letter page size for print
 - Logo upload, kept with the draft
 - Autosave to `localStorage`, a draft library, duplicate, and delete
@@ -33,48 +33,46 @@ Invoice details, logos, and drafts stay in this browser. The page does not send 
 
 ## Visual system
 
-The system is called Pressmark. The screen is a typesetter’s desk; the invoice is the only sheet of paper on it. Vermilion is a second ink, used the way a printer uses a spot color: the seal, the primary button, and one rule. Corners are cut at 2px rather than rounded into a generic app card.
+The system is Black Titanium. The studio is a dark metal desk. The invoice is the only light object on it, so the preview matches the printed page.
 
 ### Color
 
 | Role | Hex | Use |
 | --- | --- | --- |
-| Desk | `#E6DFD2` | Page background |
-| Editor | `#F6F1E7` | Form panel and dialogs |
-| Sheet | `#FFFCF8` | The invoice paper and fields |
-| Ink | `#1C1916` | Text, rules, selected controls |
-| Ink soft | `#3F3830` | Secondary text |
-| Ink muted | `#5C5348` | Labels and hints |
-| Rule | `#D5CBBC` | Hairlines and panel borders |
-| Field line | `#CDBFAE` | Input borders |
-| Seal | `#6E2218` | Primary buttons and the wax seal |
-| Seal deep | `#541910` | Button hover |
-| Vermilion | `#C4452F` | The single accent rule and the sample notice |
-| Moss | `#1E5C3A` | Saved confirmation, on `#E7F3EC` |
-| Fault | `#8E1E1E` | Errors, on `#F8E8E4` |
-| Warn | `#6F4A10` | Cautions, on `#F8F0DE` |
+| Obsidian | `#0B0B0C` | Page, fields, and ink on the sheet |
+| Graphite | `#151517` | Editor, dialogs, notices |
+| Steel | `#2A2A2E` | Borders and rules in the studio |
+| Titanium | `#C8CAD2` | Secondary text on the dark studio |
+| Platinum | `#F3EFE6` | The invoice sheet, and primary text on the dark studio |
+| Gold | `#C9A45C` | Primary button, the seal ring, and one rule |
+| Sheet muted | `#3A3A40` | Labels on the platinum sheet |
+| Saved | `#B7E4C7` | Confirmation on graphite |
+| Fault | `#F0B4AE` | Errors on graphite |
+| Warn | `#F0D7A1` | Cautions on graphite |
 
-Ink on the sheet is about 17:1. Muted labels on the editor are about 6.7:1. Cream on the seal button is about 10.8:1. The desk stays light on purpose: the PDF is paper, and a dark chrome would lie about the printed sheet.
+Platinum on obsidian is about 17:1. Titanium on graphite is about 11:1. Obsidian on the gold button is about 8.4:1. Gold is not used as small text on the platinum sheet, because that pair is about 2:1. On the sheet, gold is a ring or a rule, and the type stays obsidian.
 
 ### Type
 
-- **Instrument Serif** for the wordmark, invoice titles, client names, and the Ledger total. Italic is reserved for the Seal template’s title and the closing line.
-- **Instrument Sans** for the tools and the Plain template. Weights 400, 500, and 600.
-- Both are the SIL Open Font License subsets in `assets/fonts/`, so the page does not call a font host. Licenses are in that folder.
+- **Cormorant Garamond** for the wordmark, invoice titles, client names, and totals. Italic is the Gold Seal title and the closing line.
+- **Karla** for the tools, the form, and the Plain template. Weights 400, 500, and 600.
+- Both are SIL Open Font License subsets in `assets/fonts/`. The page does not call a font host.
 - Fallbacks are Palatino / Georgia and Avenir Next / Segoe UI.
 - Amounts use tabular figures.
 
 ### Space, icons, motion
 
-Spacing steps are 4, 8, 12, 16, 22, 28, and 40. The mark is an original folded sheet with a seal, drawn as SVG in `assets/brand/`. Icons are a small stroke set in the page, 1.75px, round caps, on a 24 grid.
+Spacing steps are 4, 8, 12, 16, 22, 28, and 40. The mark is an original folded sheet with a gold seal, drawn as SVG in `assets/brand/`. Icons are a small stroke set in the page, 1.75px, round caps, on a 24 grid.
 
-Motion is a short wash when a line is added, a soft rise on a confirmation, and a loading sheen before the sheet is ready. `prefers-reduced-motion: reduce` removes all of it. Focus is a 2px ink outline, not color alone.
+Motion is a short gold wash when a line is added, a soft rise on a confirmation, and a loading sheen before the sheet is ready. `prefers-reduced-motion: reduce` removes all of it. Focus is a 2px gold outline.
 
 ### Templates
 
-- **Ledger.** Serif name, a vermilion rule under “Invoice”, hairline table, double rule on the total.
-- **Seal.** Ink header, italic title, vermilion seal with the number, totals set in an ink block. In the print dialog, turn on background graphics or that header prints blank.
-- **Plain.** Sans throughout, wide spacing, a single ink rule on the left edge.
+All three print as a light sheet with black type.
+
+- **Ledger.** Serif name, one gold rule under “Invoice”, hairline table, double rule on the total.
+- **Gold Seal.** A gold band at the top, an italic title, and a gold ring around the number. Totals stay on the platinum sheet.
+- **Plain.** Sans throughout, wide spacing, a single gold rule on the left edge.
 
 ## Run it
 
@@ -106,18 +104,18 @@ node tests/page.test.js
 | Path | What it is |
 | --- | --- |
 | `index.html` | The studio |
-| `assets/css/quire.css` | Pressmark, including print |
+| `assets/css/quire.css` | Black Titanium, including print |
 | `assets/js/pure.js` | Money, dates, numbering, and the storage shape |
 | `assets/js/app.js` | The page |
 | `assets/brand/` | Mark and favicon |
-| `assets/fonts/` | Instrument Serif and Sans, plus their licenses |
+| `assets/fonts/` | Cormorant Garamond and Karla, plus their licenses |
 | `tests/` | Node checks for the math and the page |
 
 ## What was exercised
 
 Node checks cover line math (including `0.1 × 0.2` and half-up rounding), discount before tax, caps, negative and invalid numbers, yen with no decimals, invoice numbers, calendar dates, and rejection of SVG logos and unexpected backup shapes.
 
-Headless Chrome then loaded the page and checked the Northwind sample total (`$1,312.20`), all three templates, a blocked print when a quantity is negative, text that stays text when it contains a tag, an added line (`$1,409.40`), the 100% discount cap, the due-date warning, yen formatting, reload from `localStorage`, a fresh `INV-001`, a PNG logo on the sheet, a refused SVG, the drafts dialog, and a JSON restore (`€20.00`). Print to PDF produced one A4 page and one US Letter page with the invoice totals and without the editor. The page made no requests off the local server and reported no console exceptions. Desktop (1440) and a 390px-wide phone were both screenshotted.
+Headless Chrome, including a Black Titanium pass at 1440px and 390px, loaded the page and checked the Northwind sample total (`$1,312.20`), all three templates, a blocked print when a quantity is negative, text that stays text when it contains a tag, an added line (`$1,409.40`), the 100% discount cap, the due-date warning, yen formatting, reload from `localStorage`, a fresh `INV-001`, a PNG logo on the sheet, a refused SVG, the drafts dialog, and a JSON restore (`€20.00`). Print to PDF produced one A4 page and one US Letter page with the invoice totals and without the editor. The page made no requests off the local server and reported no console exceptions. Desktop (1440) and a 390px-wide phone were both screenshotted.
 
 Not exercised here: a person’s print dialog on macOS or Windows (including the background-graphics checkbox), Safari, Firefox, a real screen reader, a full 40-line invoice across multiple printed pages, private-browsing storage, or the storage-full path. The Pages workflow file was not changed.
 
