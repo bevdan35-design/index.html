@@ -16,9 +16,9 @@
     overflow: true
   };
   var BLURBS = {
-    rule: 'Serif wordmark, hairline rules, and a double-rule total.',
-    stamp: 'Ink header, vermilion seal, and a solid total block.',
-    quiet: 'Wide spacing, sans type, and a single ink rule.'
+    rule: 'Serif wordmark, a gold rule, and a double-rule total.',
+    stamp: 'A light sheet, a display title, and a gold seal.',
+    quiet: 'Wide spacing, sans type, and a single gold rule.'
   };
   var SETTING_IDS = { prefix: true, 'next-seq': true, pad: true };
 
@@ -834,9 +834,6 @@
     if (dialog.open) dialog.close();
     var hasLines = state.invoice.items.some(Q.lineHasContent);
     setStatus(hasLines ? 'Print dialog open. Choose Save as PDF.' : 'Printing an invoice with no line items.');
-    if (state.invoice.template === 'stamp') {
-      toast('For the Seal template, turn on background graphics so the ink header prints.');
-    }
     window.print();
   }
 

@@ -22,11 +22,13 @@ assert.equal(app.includes('innerHTML'), false);
 assert.equal(app.includes('fetch('), false);
 assert.equal(app.includes('XMLHttpRequest'), false);
 assert.equal(app.includes('eval('), false);
-assert.equal(css.includes('#6E2218'), true);
-assert.equal(css.includes('#E6DFD2'), true);
+assert.equal(css.includes('#0B0B0C'), true);
+assert.equal(css.includes('#C9A45C'), true);
+assert.equal(css.includes('#F3EFE6'), true);
 assert.equal(css.includes('@media print'), true);
 assert.equal(workflow.startsWith('# Simple workflow'), true);
 assert.equal(fs.existsSync(path.join(root, 'assets/brand/mark.svg')), true);
-assert.equal(fs.existsSync(path.join(root, 'assets/fonts/instrument-serif-400.woff2')), true);
+assert.equal(fs.existsSync(path.join(root, 'assets/fonts/cormorant-garamond-400.woff2')), true);
+assert.equal(fs.existsSync(path.join(root, 'assets/fonts/karla-400.woff2')), true);
 
 console.log('page.test.js: all assertions passed');

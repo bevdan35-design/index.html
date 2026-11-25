@@ -72,7 +72,7 @@
 
   var TEMPLATES = {
     rule: 'Ledger',
-    stamp: 'Seal',
+    stamp: 'Gold Seal',
     quiet: 'Plain'
   };
 
