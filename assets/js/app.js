@@ -5,6 +5,36 @@
   'use strict';
 
   var Q = window.Quire;
+
+  /* ---------- Quire Pro (Black Titanium Studios) ----------
+     Paste your Gumroad product link between the quotes below.
+     PRO_CODE_HASH is a fingerprint of the unlock code, not the code. */
+  var GUMROAD_LINK = '';
+  var PRO_CODE_HASH = '47c9f13dd50fc25d79920880747f4fb490862a9e0ebcec86491c3fabb19fb876';
+  var PRO_KEY = 'quire.pro';
+  var FREE = { items: 3, drafts: 3 };
+  var pro = readPro();
+
+  function readPro() {
+    try { return localStorage.getItem(PRO_KEY) === 'yes'; } catch (err) { return false; }
+  }
+  function itemLimit() { return pro ? Q.LIMITS.items : FREE.items; }
+  function draftLimit() { return pro ? Q.LIMITS.drafts : FREE.drafts; }
+  function draftLimitText() {
+    return pro ? 'The limit is ' + Q.LIMITS.drafts + '.' : 'The free version keeps ' + FREE.drafts + '. Pro keeps ' + Q.LIMITS.drafts + '.';
+  }
+  /* What the free version shows and prints: one template, no logo,
+     no discount or tax, and the first 3 lines. */
+  function gate(invoice) {
+    if (pro) return invoice;
+    var copy = cloneInvoice(invoice);
+    copy.template = 'rule';
+    copy.logo = '';
+    copy.discount = { type: 'none', value: '' };
+    copy.tax = { label: copy.tax.label, rate: '' };
+    copy.items = copy.items.slice(0, FREE.items);
+    return copy;
+  }
   var STORAGE_KEY = 'quire.v1';
   var BLOCKING = {
     'line-negative': true,
@@ -210,7 +240,7 @@
   function readForm() {
     var inv = state.invoice;
     var template = document.querySelector('input[name="template"]:checked');
-    inv.template = template && Q.TEMPLATES[template.value] ? template.value : 'rule';
+    inv.template = pro && template && Q.TEMPLATES[template.value] ? template.value : 'rule';
     inv.paper = el('paper').value === 'letter' ? 'letter' : 'a4';
     inv.currency = Q.currencyByCode(el('currency').value) ? el('currency').value : 'USD';
     inv.customSymbol = el('custom-symbol').value;
@@ -543,7 +573,8 @@
   }
 
   function renderPreview() {
-    var invoice = state.invoice;
+    var invoice = gate(state.invoice);
+    el('lines-limit').hidden = pro || state.invoice.items.length <= FREE.items;
     var totals = totalsFor(invoice);
     state.lastWarnings = totals.warnings;
     document.body.dataset.paper = invoice.paper;
@@ -633,6 +664,7 @@
       var slot = row.querySelector('[data-slot="amount"]');
       var item = invoice.items[index];
       var line = totals.lines[index];
+      if (slot && !item) slot.textContent = 'Pro';
       if (!slot || !item || !line) return;
       slot.textContent = Q.lineHasContent(item) ? format(line.minor, invoice) : '\u2014';
     });
@@ -666,9 +698,9 @@
       persist();
       return false;
     }
-    if (!exists && state.drafts.length >= Q.LIMITS.drafts) {
+    if (!exists && state.drafts.length >= draftLimit()) {
       setStatus('Not saved. Draft limit reached.', 'error');
-      toast('Delete a saved draft before this one can be kept. The limit is 30.');
+      toast('Delete a saved draft before this one can be kept. ' + draftLimitText());
       return false;
     }
     var before = state.settings.next;
@@ -720,8 +752,8 @@
         return;
       }
     }
-    if (state.drafts.length >= Q.LIMITS.drafts) {
-      toast('Delete a saved draft before starting another. This browser keeps 30.');
+    if (state.drafts.length >= draftLimit()) {
+      toast('Delete a saved draft before starting another. ' + draftLimitText());
       openDrafts();
       return;
     }
@@ -757,8 +789,8 @@
   function addLine() {
     readForm();
     if (state.invoice.origin === 'sample') state.invoice.origin = 'user';
-    if (state.invoice.items.length >= Q.LIMITS.items) {
-      toast('This invoice holds up to 40 lines.');
+    if (state.invoice.items.length >= itemLimit()) {
+      toast(pro ? 'This invoice holds up to 40 lines.' : 'The free version holds 3 lines. Quire Pro holds up to 40.');
       return;
     }
     var item = Q.blankItem();
@@ -946,8 +978,8 @@
   }
 
   function duplicateDraft(id) {
-    if (state.drafts.length >= Q.LIMITS.drafts) {
-      toast('Delete a draft before duplicating. The limit is 30.');
+    if (state.drafts.length >= draftLimit()) {
+      toast('Delete a draft before duplicating. ' + draftLimitText());
       return;
     }
     var source = null;
@@ -1007,6 +1039,7 @@
   }
 
   function downloadBackup() {
+    if (!pro) { toast('Backups come with Quire Pro.'); return; }
     if (state.invoice.origin !== 'sample') saveNow();
     var data = payload();
     data.exportedAt = new Date().toISOString();
@@ -1017,6 +1050,7 @@
   function onBackupFile(file) {
     el('drafts-error').hidden = true;
     if (!file) return;
+    if (!pro) { toast('Backups come with Quire Pro.'); return; }
     if (file.size > 8000000) {
       el('drafts-error').hidden = false;
       el('drafts-error').textContent = 'That backup is over 8 MB. Quire did not read it.';
@@ -1076,6 +1110,7 @@
   function onLogoFile(file) {
     setLogoMessage('');
     if (!file) return;
+    if (!pro) { setLogoMessage('Your logo comes with Quire Pro.'); return; }
     if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
       setLogoMessage('SVG logos are not accepted. Use a PNG, JPEG, WebP, or GIF.');
       return;
@@ -1227,7 +1262,68 @@
     onInvoiceInput();
   }
 
+  function sha256Hex(text) {
+    return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buffer) {
+      return Array.prototype.map.call(new Uint8Array(buffer), function (byte) {
+        return byte.toString(16).padStart(2, '0');
+      }).join('');
+    });
+  }
+
+  function setProMessage(message, tone) {
+    var node = el('pro-msg');
+    node.hidden = !message;
+    node.textContent = message || '';
+    node.className = 'pro-msg' + (tone ? ' is-' + tone : '');
+  }
+
+  function tryUnlock() {
+    var code = el('pro-code').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!code) { setProMessage('Type the unlock code from your receipt.', 'error'); return; }
+    if (!(window.crypto && window.crypto.subtle && window.TextEncoder)) {
+      setProMessage('Open Quire from its web address to unlock Pro.', 'error');
+      return;
+    }
+    sha256Hex(code).then(function (hash) {
+      if (hash !== PRO_CODE_HASH) {
+        setProMessage('That code did not work. Check it against your receipt and try again.', 'error');
+        return;
+      }
+      try { localStorage.setItem(PRO_KEY, 'yes'); } catch (err) {
+        setProMessage('This browser is not storing data, so Pro cannot stay unlocked here.', 'error');
+        return;
+      }
+      if (state.invoice && state.invoice.origin !== 'sample') saveNow();
+      setProMessage('Pro unlocked. Welcome!', 'saved');
+      window.setTimeout(function () { window.location.reload(); }, 700);
+    }, function () {
+      setProMessage('Could not check the code in this browser.', 'error');
+    });
+  }
+
+  function setupPro() {
+    document.body.classList.toggle('is-pro', pro);
+    el('plan-badge').textContent = pro ? 'Pro' : 'Free';
+    document.querySelectorAll('input[name="template"]').forEach(function (input) {
+      if (input.value !== 'rule') input.disabled = !pro;
+    });
+    var buy = el('pro-buy');
+    if (GUMROAD_LINK) {
+      buy.href = GUMROAD_LINK;
+    } else {
+      buy.removeAttribute('href');
+      buy.textContent = 'Pro coming soon';
+      buy.classList.add('is-disabled');
+      buy.setAttribute('aria-disabled', 'true');
+    }
+    el('pro-unlock').addEventListener('click', tryUnlock);
+    el('pro-code').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') { event.preventDefault(); tryUnlock(); }
+    });
+  }
+
   function bind() {
+    setupPro();
     var form = el('editor');
     form.addEventListener('submit', function (event) { event.preventDefault(); });
     form.addEventListener('input', onFormEvent);
@@ -1236,6 +1332,12 @@
     });
     document.querySelector('.segment').addEventListener('change', function (event) {
       if (event.target.name !== 'template') return;
+      if (!pro && event.target.value !== 'rule') {
+        event.target.checked = false;
+        document.querySelector('input[name="template"][value="rule"]').checked = true;
+        toast('Gold Seal and Plain come with Quire Pro.');
+        return;
+      }
       readForm();
       state.invoice.template = event.target.value;
       state.settings.template = event.target.value;
