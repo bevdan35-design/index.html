@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quire — Private invoice studio</title>
+  <meta name="description" content="Quire is a private invoice studio. Compose an invoice, preview it, and print or save a PDF. Line items, tax, and drafts stay in this browser.">
+  <meta name="theme-color" content="#0B0B0C">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'">
+  <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/quire.css">
+</head>
+<body data-view="edit" data-paper="a4">
+  <a class="skip" href="#editor">Skip to invoice editor</a>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M5 7h14M9 7V5h6v2M8 7l1 13h6l1-13"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M6 14l6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M6 10l6 6 6-6"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M7 9V4h10v5M6 18H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1"/><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M7 14h10v6H7z"/></symbol>
+    <symbol id="i-drafts" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M6 3h9l3 3v15H6z"/><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M15 3v3h3M8 12h8M8 16h5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M12 4v10M8 10l4 4 4-4M5 19h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5 9-10"/></symbol>
+  </svg>
+
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/brand/mark.svg" width="36" height="36" alt="">
+        <div>
+          <h1>Quire</h1>
+          <p>Private invoice studio</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="plan-badge" class="plan-badge">Free</span>
+        <button type="button" class="button-ghost" id="open-drafts">Drafts</button>
+        <button type="button" class="button-ghost" id="new-invoice">New</button>
+        <button type="button" class="button-primary" id="print">Print / PDF</button>
+      </div>
+    </header>
+
+    <p class="lede">Compose a finished invoice, then print it or save a PDF from the browser dialog. Totals, logos, and drafts never leave this device.</p>
+
+    <details id="pro-card" class="pro-card">
+      <summary><span class="pro-title">Quire Pro</span> <span class="pro-price">$12, pay once</span></summary>
+      <ul class="pro-list">
+        <li>Up to 40 lines, plus discount and tax</li>
+        <li>Your logo on every invoice</li>
+        <li>Gold Seal and Plain templates</li>
+        <li>Keep 30 drafts instead of 3</li>
+        <li>Backup and restore</li>
+        <li>No &ldquo;Made with Quire&rdquo; line on the invoice</li>
+      </ul>
+      <a id="pro-buy" class="button-primary pro-buy" href="#" target="_blank" rel="noopener">Get Pro</a>
+      <div class="pro-unlock">
+        <label>Already bought it? Type your unlock code
+          <input id="pro-code" type="text" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="BTS-XXXX-XXXX">
+        </label>
+        <button type="button" class="button-ghost" id="pro-unlock">Unlock</button>
+      </div>
+      <p id="pro-msg" class="pro-msg" role="status" hidden></p>
+      <p class="hint">Pro stays unlocked in this browser. Unlock again on each phone or computer you use.</p>
+    </details>
+
+    <noscript>
+      <p class="banner banner-warn">Quire needs JavaScript to total the invoice and refresh the preview. The script runs only on this page and does not upload invoice data.</p>
+    </noscript>
+
+    <div id="storage-banner" class="banner banner-fault" hidden>
+      <p id="storage-banner-text"></p>
+      <div id="storage-actions" class="banner-actions" hidden>
+        <button type="button" class="button-ghost" id="download-corrupt">Download unreadable save</button>
+        <button type="button" class="button-danger" id="discard-corrupt">Discard it</button>
+      </div>
+    </div>
+
+    <div id="notice" class="notice" hidden></div>
+    <p id="form-alert" class="banner banner-fault" role="alert" tabindex="-1" hidden></p>
+
+    <div class="view-switch" aria-label="Choose what to work on">
+      <button type="button" id="view-edit" aria-pressed="true">Edit</button>
+      <button type="button" id="view-preview" aria-pressed="false">Preview</button>
+    </div>
+
+    <div class="studio-bar">
+      <div class="studio-controls">
+        <div class="segment" role="radiogroup" aria-label="Invoice template" aria-describedby="template-blurb">
+          <label class="segment-option">
+            <input type="radio" name="template" value="rule" checked>
+            <span>Ledger</span>
+          </label>
+          <label class="segment-option">
+            <input type="radio" name="template" value="stamp">
+            <span>Gold Seal</span>
+          </label>
+          <label class="segment-option">
+            <input type="radio" name="template" value="quiet">
+            <span>Plain</span>
+          </label>
+        </div>
+        <label class="paper-field">Paper
+          <select id="paper">
+            <option value="a4">A4</option>
+            <option value="letter">US Letter</option>
+          </select>
+        </label>
+      </div>
+      <p class="pro-teaser">Gold Seal and Plain come with Quire Pro.</p>
+      <p id="template-blurb" class="blurb">Serif wordmark, hairline rules, and a double-rule total.</p>
+      <p id="print-hint" class="hint" hidden>Gold Seal prints on the same light sheet, with a gold ring around the number.</p>
+    </div>
+
+    <div class="actionbar">
+      <div>
+        <p class="micro">Total</p>
+        <strong id="action-total">—</strong>
+      </div>
+      <button type="button" class="button-primary" id="action-print">Print / PDF</button>
+    </div>
+
+    <div class="workspace">
+      <form id="editor" class="editor" aria-labelledby="editor-title">
+        <h2 id="editor-title" class="sr-only">Edit invoice</h2>
+
+        <section aria-labelledby="document-title">
+          <h3 id="document-title">Document</h3>
+          <p class="section-note">The number on a new invoice advances only after you keep it or assign the next one.</p>
+          <div class="fields">
+            <label>Currency
+              <select id="currency" name="currency">
+                <option value="USD">USD — US dollar</option>
+              </select>
+            </label>
+            <div id="custom-currency" class="custom-currency" hidden>
+              <label>Symbol
+                <input id="custom-symbol" name="custom-symbol" type="text" maxlength="8" value="$" autocomplete="off" spellcheck="false">
+              </label>
+              <label>Decimals
+                <select id="custom-digits" name="custom-digits">
+                  <option value="2">2</option>
+                  <option value="0">0</option>
+                </select>
+              </label>
+            </div>
+            <label>Invoice number
+              <input id="number" name="number" type="text" maxlength="40" autocomplete="off" spellcheck="false">
+            </label>
+            <label>Issue date
+              <input id="issued" name="issued" type="date">
+            </label>
+            <label>Due date
+              <input id="due" name="due" type="date" aria-describedby="due-warning">
+            </label>
+            <p id="due-warning" class="field-warning field-span" hidden></p>
+            <label>PO number <span class="opt">Optional</span>
+              <input id="po" name="po" type="text" maxlength="40" autocomplete="off">
+            </label>
+          </div>
+          <details id="numbering" class="numbering">
+            <summary>Numbering</summary>
+            <div class="fields">
+              <label>Prefix
+                <input id="prefix" name="prefix" type="text" maxlength="12" value="INV-" autocomplete="off" spellcheck="false">
+              </label>
+              <label>Next number
+                <input id="next-seq" name="next-seq" type="text" inputmode="numeric" maxlength="6" value="1" autocomplete="off">
+              </label>
+              <label>Digits
+                <input id="pad" name="pad" type="text" inputmode="numeric" maxlength="1" value="3" autocomplete="off">
+              </label>
+            </div>
+            <button type="button" class="button-ghost" id="assign-number">Assign next number</button>
+            <p class="hint">The counter lives only in this browser. Assigning a number, or keeping an invoice that still has its suggested number, advances it.</p>
+          </details>
+        </section>
+
+        <section aria-labelledby="from-title">
+          <h3 id="from-title">From</h3>
+          <p class="section-note">Your studio or company, as it should appear on the sheet.</p>
+          <div class="fields">
+            <label class="field-span">Business name
+              <input id="from-name" name="from-name" type="text" maxlength="120" autocomplete="organization">
+            </label>
+            <label class="field-span">Address <span class="opt">Optional</span>
+              <textarea id="from-address" name="from-address" maxlength="400" rows="4" autocomplete="off"></textarea>
+            </label>
+            <label>Email or phone <span class="opt">Optional</span>
+              <input id="from-contact" name="from-contact" type="text" maxlength="120" autocomplete="email">
+            </label>
+            <label>Tax ID <span class="opt">Optional</span>
+              <input id="from-tax" name="from-tax" type="text" maxlength="60" autocomplete="off">
+            </label>
+          </div>
+        </section>
+
+        <section aria-labelledby="to-title">
+          <h3 id="to-title">Bill to</h3>
+          <div class="fields">
+            <label class="field-span">Client name
+              <input id="to-name" name="to-name" type="text" maxlength="120" autocomplete="organization">
+            </label>
+            <label class="field-span">Address <span class="opt">Optional</span>
+              <textarea id="to-address" name="to-address" maxlength="400" rows="4" autocomplete="off"></textarea>
+            </label>
+            <label class="field-span">Email or phone <span class="opt">Optional</span>
+              <input id="to-contact" name="to-contact" type="text" maxlength="120" autocomplete="off">
+            </label>
+          </div>
+        </section>
+
+        <section aria-labelledby="lines-title">
+          <h3 id="lines-title">Line items</h3>
+          <p class="section-note">Quantity times rate, rounded in the invoice currency. Use a decimal point, as in 1.5 or 75.00. Blank lines stay off the sheet.</p>
+          <div id="line-items"></div>
+          <p id="lines-empty" class="hint" hidden>No line items yet.</p>
+          <p id="lines-limit" class="field-warning" hidden>The free version prints the first 3 lines. Quire Pro prints up to 40.</p>
+          <button type="button" class="button-ghost add-line" id="add-line">Add a line</button>
+        </section>
+
+        <section aria-labelledby="adjust-title" data-pro>
+          <h3 id="adjust-title">Discount and tax</h3>
+          <p class="section-note">Discount comes off the subtotal. Tax is calculated on what remains.</p>
+          <p class="pro-teaser">Discount and tax come with Quire Pro.</p>
+          <div class="fields">
+            <label>Discount
+              <select id="discount-type" name="discount-type">
+                <option value="none">None</option>
+                <option value="percent">Percent</option>
+                <option value="amount">Fixed amount</option>
+              </select>
+            </label>
+            <label><span id="discount-value-label">Value</span>
+              <input id="discount-value" name="discount-value" type="text" inputmode="decimal" maxlength="16" autocomplete="off" spellcheck="false" aria-describedby="adjust-warning">
+            </label>
+            <p id="adjust-warning" class="field-warning field-span" role="status" hidden></p>
+            <label>Tax name
+              <input id="tax-label" name="tax-label" type="text" maxlength="40" value="Tax" autocomplete="off">
+            </label>
+            <label>Tax rate %
+              <input id="tax-rate" name="tax-rate" type="text" inputmode="decimal" maxlength="16" autocomplete="off" spellcheck="false" placeholder="0" aria-describedby="tax-warning">
+            </label>
+            <p id="tax-warning" class="field-warning field-span" role="status" hidden></p>
+          </div>
+        </section>
+
+        <section aria-labelledby="notes-title">
+          <h3 id="notes-title">Notes and payment</h3>
+          <div class="fields">
+            <label class="field-span">Notes <span class="opt">Optional</span>
+              <textarea id="notes" name="notes" maxlength="800" rows="3"></textarea>
+            </label>
+            <label class="field-span">Payment instructions <span class="opt">Optional</span>
+              <textarea id="payment" name="payment" maxlength="800" rows="3"></textarea>
+            </label>
+            <label class="field-span">Closing line <span class="opt">Optional</span>
+              <input id="footer" name="footer" type="text" maxlength="160" autocomplete="off">
+            </label>
+          </div>
+        </section>
+
+        <section aria-labelledby="logo-title" data-pro>
+          <h3 id="logo-title">Logo</h3>
+          <p class="pro-teaser">Your logo on every invoice comes with Quire Pro.</p>
+          <p class="section-note">PNG, JPEG, WebP, or GIF. It is resized on this device and stored with the draft. SVG files are refused.</p>
+          <div class="logo-row">
+            <img id="logo-preview" class="logo-preview" alt="" hidden>
+            <div class="logo-actions">
+              <label class="file-button">
+                <input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                <span id="logo-label">Upload logo</span>
+              </label>
+              <button type="button" class="button-ghost" id="logo-remove" hidden>Remove logo</button>
+              <p id="logo-error" class="field-error" role="alert" hidden></p>
+            </div>
+          </div>
+        </section>
+
+        <div class="editor-foot">
+          <p id="save-status" class="save-status">Opening your desk…</p>
+          <div class="editor-actions">
+            <button type="button" class="button-ghost" id="load-sample">Load sample</button>
+          </div>
+          <div id="sample-confirm" class="confirm" hidden>
+            <p>Load the Northwind sample over this invoice? A saved draft stays in Drafts.</p>
+            <button type="button" class="button-primary" id="sample-confirm-yes">Load sample</button>
+            <button type="button" class="button-ghost" id="sample-confirm-no">Cancel</button>
+          </div>
+        </div>
+      </form>
+
+      <section class="preview-panel" id="preview" aria-labelledby="preview-title">
+        <div class="preview-chrome">
+          <div class="preview-heading">
+            <h2 id="preview-title">Preview</h2>
+            <p id="preview-status">Opening your desk…</p>
+          </div>
+          <p id="due-badge" class="badge screen-only" hidden></p>
+        </div>
+        <article id="sheet" class="sheet" data-template="rule" aria-label="Invoice preview" aria-busy="true">
+          <div id="skeleton" class="skeleton" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="sheet-content" hidden>
+            <header class="sheet-head">
+              <div class="sheet-brand">
+                <img id="sheet-logo" class="sheet-logo" alt="" hidden>
+                <p id="sheet-from-name" class="sheet-name"></p>
+              </div>
+              <div class="sheet-title">
+                <p class="sheet-kicker">Invoice</p>
+                <p class="sheet-number">No. <span id="sheet-number"></span></p>
+              </div>
+              <div class="seal" aria-hidden="true">
+                <span class="seal-label">No.</span>
+                <span id="sheet-seal" class="seal-num"></span>
+              </div>
+            </header>
+            <div class="sheet-body">
+              <div class="sheet-parties">
+                <div>
+                  <p class="micro">From</p>
+                  <p id="sheet-from-address" class="pre"></p>
+                  <p id="sheet-from-contact" class="sheet-quiet"></p>
+                  <p id="sheet-from-tax" class="sheet-quiet"></p>
+                </div>
+                <div>
+                  <p class="micro">Bill to</p>
+                  <p id="sheet-to-name" class="emphasis"></p>
+                  <p id="sheet-to-address" class="pre"></p>
+                  <p id="sheet-to-contact" class="sheet-quiet"></p>
+                </div>
+                <dl class="sheet-meta">
+                  <div><dt>Issued</dt><dd id="sheet-issued"></dd></div>
+                  <div><dt>Due</dt><dd id="sheet-due"></dd></div>
+                  <div id="sheet-po-row"><dt>PO</dt><dd id="sheet-po"></dd></div>
+                  <div><dt>Currency</dt><dd id="sheet-currency"></dd></div>
+                </dl>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <caption class="sr-only">Line items</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Description</th>
+                      <th scope="col" class="num"><abbr title="Quantity">Qty</abbr></th>
+                      <th scope="col" class="num">Rate</th>
+                      <th scope="col" class="num">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sheet-lines"></tbody>
+                </table>
+              </div>
+              <div class="sheet-summary">
+                <div class="sheet-notes">
+                  <div id="sheet-notes-block">
+                    <p class="micro">Notes</p>
+                    <p id="sheet-notes" class="pre"></p>
+                  </div>
+                  <div id="sheet-payment-block">
+                    <p class="micro">Payment</p>
+                    <p id="sheet-payment" class="pre"></p>
+                  </div>
+                </div>
+                <dl class="totals">
+                  <div id="row-subtotal"><dt>Subtotal</dt><dd id="subtotal-amount"></dd></div>
+                  <div id="row-discount"><dt id="discount-label">Discount</dt><dd id="discount-amount"></dd></div>
+                  <div id="row-tax"><dt id="tax-row-label">Tax</dt><dd id="tax-amount"></dd></div>
+                  <div class="grand"><dt>Total</dt><dd id="total-amount"></dd></div>
+                </dl>
+              </div>
+            </div>
+            <footer class="sheet-foot" id="sheet-foot">
+              <p id="sheet-footer"></p>
+            </footer>
+            <p id="sheet-made" class="sheet-made">Made with Quire &middot; Black Titanium Studios</p>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <footer class="colophon">
+      <p>Quire never uploads invoice details, logos, or drafts. Print and PDF use the dialog built into your browser.</p>
+    </footer>
+  </div>
+
+  <dialog id="drafts-dialog" aria-labelledby="drafts-title">
+    <div class="dialog-card">
+      <div class="dialog-head">
+        <h2 id="drafts-title">Drafts on this device</h2>
+        <button type="button" class="icon-button" id="drafts-close" aria-label="Close drafts">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+      <p class="hint">Saved in this browser only. A backup file is how you move them, and it contains client names, amounts, and logos.</p>
+      <div id="drafts-list"></div>
+      <p id="drafts-empty" class="hint" hidden>No saved drafts yet. An invoice is kept after you edit it.</p>
+      <p class="pro-teaser">Backup and restore come with Quire Pro. The free version keeps 3 drafts.</p>
+      <div class="dialog-backup">
+        <button type="button" class="button-ghost" id="backup-download">Download backup</button>
+        <label class="file-button">
+          <input id="backup-file" type="file" accept="application/json,.json">
+          <span>Restore backup</span>
+        </label>
+      </div>
+      <div id="import-confirm" class="confirm" hidden>
+        <p id="import-summary"></p>
+        <button type="button" class="button-primary" id="import-yes">Replace drafts</button>
+        <button type="button" class="button-ghost" id="import-no">Cancel</button>
+      </div>
+      <p id="drafts-error" class="field-error" role="alert" hidden></p>
+    </div>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+  <p id="sr-total" class="sr-only" aria-live="polite"></p>
+
+  <script src="assets/js/pure.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
