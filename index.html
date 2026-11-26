@@ -36,6 +36,7 @@
         </div>
       </div>
       <div class="top-actions">
+        <span id="plan-badge" class="plan-badge">Free</span>
         <button type="button" class="button-ghost" id="open-drafts">Drafts</button>
         <button type="button" class="button-ghost" id="new-invoice">New</button>
         <button type="button" class="button-primary" id="print">Print / PDF</button>
@@ -43,6 +44,27 @@
     </header>
 
     <p class="lede">Compose a finished invoice, then print it or save a PDF from the browser dialog. Totals, logos, and drafts never leave this device.</p>
+
+    <details id="pro-card" class="pro-card">
+      <summary><span class="pro-title">Quire Pro</span> <span class="pro-price">$12, pay once</span></summary>
+      <ul class="pro-list">
+        <li>Up to 40 lines, plus discount and tax</li>
+        <li>Your logo on every invoice</li>
+        <li>Gold Seal and Plain templates</li>
+        <li>Keep 30 drafts instead of 3</li>
+        <li>Backup and restore</li>
+        <li>No &ldquo;Made with Quire&rdquo; line on the invoice</li>
+      </ul>
+      <a id="pro-buy" class="button-primary pro-buy" href="#" target="_blank" rel="noopener">Get Pro</a>
+      <div class="pro-unlock">
+        <label>Already bought it? Type your unlock code
+          <input id="pro-code" type="text" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="BTS-XXXX-XXXX">
+        </label>
+        <button type="button" class="button-ghost" id="pro-unlock">Unlock</button>
+      </div>
+      <p id="pro-msg" class="pro-msg" role="status" hidden></p>
+      <p class="hint">Pro stays unlocked in this browser. Unlock again on each phone or computer you use.</p>
+    </details>
 
     <noscript>
       <p class="banner banner-warn">Quire needs JavaScript to total the invoice and refresh the preview. The script runs only on this page and does not upload invoice data.</p>
@@ -87,6 +109,7 @@
           </select>
         </label>
       </div>
+      <p class="pro-teaser">Gold Seal and Plain come with Quire Pro.</p>
       <p id="template-blurb" class="blurb">Serif wordmark, hairline rules, and a double-rule total.</p>
       <p id="print-hint" class="hint" hidden>Gold Seal prints on the same light sheet, with a gold ring around the number.</p>
     </div>
@@ -194,12 +217,14 @@
           <p class="section-note">Quantity times rate, rounded in the invoice currency. Use a decimal point, as in 1.5 or 75.00. Blank lines stay off the sheet.</p>
           <div id="line-items"></div>
           <p id="lines-empty" class="hint" hidden>No line items yet.</p>
+          <p id="lines-limit" class="field-warning" hidden>The free version prints the first 3 lines. Quire Pro prints up to 40.</p>
           <button type="button" class="button-ghost add-line" id="add-line">Add a line</button>
         </section>
 
-        <section aria-labelledby="adjust-title">
+        <section aria-labelledby="adjust-title" data-pro>
           <h3 id="adjust-title">Discount and tax</h3>
           <p class="section-note">Discount comes off the subtotal. Tax is calculated on what remains.</p>
+          <p class="pro-teaser">Discount and tax come with Quire Pro.</p>
           <div class="fields">
             <label>Discount
               <select id="discount-type" name="discount-type">
@@ -237,8 +262,9 @@
           </div>
         </section>
 
-        <section aria-labelledby="logo-title">
+        <section aria-labelledby="logo-title" data-pro>
           <h3 id="logo-title">Logo</h3>
+          <p class="pro-teaser">Your logo on every invoice comes with Quire Pro.</p>
           <p class="section-note">PNG, JPEG, WebP, or GIF. It is resized on this device and stored with the draft. SVG files are refused.</p>
           <div class="logo-row">
             <img id="logo-preview" class="logo-preview" alt="" hidden>
@@ -350,6 +376,7 @@
             <footer class="sheet-foot" id="sheet-foot">
               <p id="sheet-footer"></p>
             </footer>
+            <p id="sheet-made" class="sheet-made">Made with Quire &middot; Black Titanium Studios</p>
           </div>
         </article>
       </section>
@@ -371,6 +398,7 @@
       <p class="hint">Saved in this browser only. A backup file is how you move them, and it contains client names, amounts, and logos.</p>
       <div id="drafts-list"></div>
       <p id="drafts-empty" class="hint" hidden>No saved drafts yet. An invoice is kept after you edit it.</p>
+      <p class="pro-teaser">Backup and restore come with Quire Pro. The free version keeps 3 drafts.</p>
       <div class="dialog-backup">
         <button type="button" class="button-ghost" id="backup-download">Download backup</button>
         <label class="file-button">
