@@ -792,3 +792,78 @@ body[data-paper="letter"] .sheet { page: lettersheet; }
     transition: none !important;
   }
 }
+
+
+/* ---------- Quire Pro ---------- */
+.plan-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+body.is-pro .plan-badge { background: var(--gold); color: var(--obsidian); }
+.pro-card {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  background: var(--graphite);
+  border: 1px solid var(--steel);
+  border-left: 3px solid var(--gold);
+}
+.pro-card summary {
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-height: 32px;
+}
+.pro-title { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; }
+.pro-price { color: var(--gold); font-weight: 600; }
+.pro-list { margin: 12px 0 14px; padding-left: 20px; color: var(--ink-soft); }
+.pro-list li { margin: 3px 0; }
+.pro-buy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  width: 100%;
+  max-width: 320px;
+}
+.pro-buy.is-disabled { opacity: 0.55; pointer-events: none; }
+.pro-unlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+.pro-unlock label { flex: 1 1 220px; display: grid; gap: 6px; font-size: 0.92rem; color: var(--ink-soft); }
+.pro-unlock input { min-height: 44px; font-size: 16px; text-transform: uppercase; }
+.pro-msg { margin: 10px 0 0; }
+.pro-msg.is-error { color: var(--fault); }
+.pro-msg.is-saved { color: var(--moss); }
+.pro-teaser { margin: 0 0 12px; color: var(--gold); font-size: 0.92rem; }
+body.is-pro .pro-card,
+body.is-pro .pro-teaser,
+body.is-pro .sheet-made { display: none !important; }
+body:not(.is-pro) section[data-pro] .fields,
+body:not(.is-pro) section[data-pro] .logo-row,
+body:not(.is-pro) .dialog-backup { display: none !important; }
+body:not(.is-pro) .segment-option:has(input:disabled) span { opacity: 0.45; }
+.sheet-made {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--sheet-soft);
+}
+@media print {
+  .pro-card, .pro-teaser, .plan-badge { display: none !important; }
+}
